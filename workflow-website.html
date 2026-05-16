@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorkflowDN — Workflow & Chatflow Thông Minh</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060810;
+    --surface: #0d1120;
+    --surface2: #141828;
+    --accent: #4DFFA0;
+    --accent2: #4D9FFF;
+    --accent3: #FF6B4D;
+    --text: #E8EBF5;
+    --muted: #6B7499;
+    --border: rgba(255,255,255,0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 60px;
+    background: rgba(6,8,16,0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--accent); }
+
+  nav ul {
+    display: flex;
+    list-style: none;
+    gap: 36px;
+  }
+  nav ul a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    transition: color 0.2s;
+  }
+  nav ul a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--accent);
+    color: #060810 !important;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 600 !important;
+    font-size: 13px !important;
+    transition: opacity 0.2s !important;
+  }
+  .nav-cta:hover { opacity: 0.85; color: #060810 !important; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 120px 40px 80px;
+    position: relative;
+  }
+
+  /* Ambient glow orbs */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.15;
+    pointer-events: none;
+    animation: drift 8s ease-in-out infinite alternate;
+  }
+  .orb1 { width: 600px; height: 600px; background: var(--accent2); top: -100px; left: -100px; animation-delay: 0s; }
+  .orb2 { width: 500px; height: 500px; background: var(--accent); top: 100px; right: -100px; animation-delay: -3s; }
+  .orb3 { width: 400px; height: 400px; background: var(--accent3); bottom: 0; left: 30%; animation-delay: -6s; }
+
+  @keyframes drift {
+    from { transform: translate(0,0) scale(1); }
+    to { transform: translate(30px, 20px) scale(1.05); }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(77,255,160,0.1);
+    border: 1px solid rgba(77,255,160,0.25);
+    color: var(--accent);
+    padding: 7px 18px;
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    animation: fadeUp 0.8s ease both;
+  }
+  .badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -3px;
+    max-width: 900px;
+    animation: fadeUp 0.8s 0.1s ease both;
+  }
+
+  h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    margin-top: 28px;
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 560px;
+    line-height: 1.65;
+    font-weight: 300;
+    animation: fadeUp 0.8s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 48px;
+    animation: fadeUp 0.8s 0.3s ease both;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #060810;
+    padding: 16px 32px;
+    border-radius: 10px;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(77,255,160,0.3);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text);
+    padding: 16px 32px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-secondary:hover {
+    border-color: rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.04);
+  }
+
+  /* ── FLOW CANVAS ── */
+  .flow-canvas {
+    margin-top: 80px;
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    animation: fadeUp 0.8s 0.5s ease both;
+  }
+
+  .canvas-frame {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .canvas-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(77,159,255,0.05) 0%, transparent 60%);
+  }
+
+  .canvas-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #FF5F57; }
+  .dot-y { background: #FEBC2E; }
+  .dot-g { background: #28C840; }
+  .canvas-title { margin-left: 12px; font-size: 13px; color: var(--muted); font-weight: 500; }
+
+  /* Flow nodes */
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+    align-items: center;
+  }
+
+  .flow-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 12px;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    animation: nodeIn 0.5s ease both;
+  }
+  .flow-node:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255,255,255,0.15);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .flow-node.active { border-color: var(--accent); box-shadow: 0 0 20px rgba(77,255,160,0.15); }
+  .flow-node.active2 { border-color: var(--accent2); box-shadow: 0 0 20px rgba(77,159,255,0.15); }
+
+  .node-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+    display: block;
+  }
+  .node-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .node-status {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 18px;
+    position: relative;
+  }
+  .flow-arrow::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  @keyframes nodeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── METRICS BAR ── */
+  .metrics {
+    display: flex;
+    gap: 0;
+    margin-top: 24px;
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+  }
+  .metric {
+    flex: 1;
+    text-align: center;
+    padding: 0 16px;
+    border-right: 1px solid var(--border);
+  }
+  .metric:last-child { border-right: none; }
+  .metric-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .metric-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── SECTION SHARED ── */
+  section { padding: 100px 60px; }
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(32px, 4vw, 52px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    max-width: 600px;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 16px;
+    margin-top: 16px;
+    max-width: 500px;
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* ── FEATURES ── */
+  .features {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .features-header {
+    text-align: center;
+    margin-bottom: 72px;
+  }
+  .features-header .section-title { max-width: 100%; }
+  .features-header .section-sub { max-width: 540px; margin: 16px auto 0; }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    padding: 40px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.2s;
+  }
+  .feature-card:hover { background: var(--surface2); }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  }
+
+  .feature-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-bottom: 24px;
+  }
+  .fi-green { background: rgba(77,255,160,0.12); }
+  .fi-blue { background: rgba(77,159,255,0.12); }
+  .fi-orange { background: rgba(255,107,77,0.12); }
+
+  .feature-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  .feature-desc { font-size: 14px; color: var(--muted); line-height: 1.7; font-weight: 300; }
+
+  .feature-tag {
+    display: inline-block;
+    margin-top: 20px;
+    font-size: 11px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── WORKFLOW STEPS ── */
+  .steps-section { max-width: 1200px; margin: 0 auto; }
+
+  .steps-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+    margin-top: 64px;
+  }
+
+  .steps-list { display: flex; flex-direction: column; gap: 0; }
+
+  .step {
+    display: flex;
+    gap: 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .step:last-child { border-bottom: none; }
+  .step:hover .step-content-title { color: var(--accent); }
+
+  .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    min-width: 28px;
+    padding-top: 4px;
+  }
+  .step.active .step-num { color: var(--accent); }
+
+  .step-content-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    transition: color 0.2s;
+    letter-spacing: -0.3px;
+  }
+  .step-content-desc { font-size: 14px; color: var(--muted); line-height: 1.65; font-weight: 300; }
+
+  /* Chat preview panel */
+  .chat-preview {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .chat-header {
+    background: var(--surface2);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chat-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+  }
+
+  .chat-name { font-size: 14px; font-weight: 600; }
+  .chat-status { font-size: 11px; color: var(--accent); }
+
+  .chat-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
+
+  .chat-msg {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    animation: msgIn 0.3s ease both;
+  }
+  .chat-msg.user { flex-direction: row-reverse; }
+
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-bubble {
+    max-width: 75%;
+    padding: 12px 16px;
+    border-radius: 16px;
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+  .bot .msg-bubble { background: var(--surface2); border-radius: 4px 16px 16px 16px; color: var(--text); }
+  .user .msg-bubble { background: var(--accent); color: #060810; border-radius: 16px 4px 16px 16px; font-weight: 500; }
+
+  .msg-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+  }
+  .bot .msg-avatar { background: var(--surface2); }
+  .user .msg-avatar { background: rgba(77,255,160,0.2); }
+
+  .chat-input-bar {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .chat-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+  }
+  .chat-input::placeholder { color: var(--muted); }
+  .chat-send {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--accent);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #060810;
+    font-size: 16px;
+    transition: opacity 0.2s;
+  }
+  .chat-send:hover { opacity: 0.8; }
+
+  /* ── INTEGRATIONS ── */
+  .integrations { text-align: center; }
+
+  .integrations-sub { color: var(--muted); margin: 12px auto 48px; max-width: 480px; font-size: 15px; font-weight: 300; }
+
+  .logos-track {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+
+  .logo-chip {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .logo-chip:hover {
+    border-color: rgba(255,255,255,0.15);
+    color: var(--text);
+    background: var(--surface2);
+  }
+  .logo-chip span { font-size: 18px; }
+
+  /* ── PRICING ── */
+  .pricing { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .pricing-header { text-align: center; margin-bottom: 64px; }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .plan {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 32px;
+    position: relative;
+    transition: transform 0.2s;
+  }
+  .plan:hover { transform: translateY(-4px); }
+  .plan.featured {
+    border-color: var(--accent);
+    background: linear-gradient(135deg, rgba(77,255,160,0.05) 0%, var(--bg) 60%);
+  }
+
+  .plan-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent);
+    color: #060810;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .plan-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+
+  .plan-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 48px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .plan-price sup { font-size: 24px; font-weight: 600; vertical-align: super; }
+  .plan-price-sub { font-size: 13px; color: var(--muted); margin-top: 6px; margin-bottom: 28px; }
+
+  .plan-divider { height: 1px; background: var(--border); margin-bottom: 24px; }
+
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+  .plan-features li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+  .plan-features li::before { content: '✓'; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+  .plan-features li.dim::before { color: var(--muted); opacity: 0.4; }
+  .plan-features li.dim { opacity: 0.4; }
+
+  .plan-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .plan-btn:hover { border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
+  .plan-btn.featured-btn {
+    background: var(--accent);
+    color: #060810;
+    border-color: transparent;
+  }
+  .plan-btn.featured-btn:hover { opacity: 0.85; }
+
+  /* ── CTA ── */
+  .cta {
+    text-align: center;
+    padding: 140px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-glow {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(77,255,160,0.12) 0%, transparent 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+
+  .cta h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    position: relative;
+  }
+
+  .cta p { color: var(--muted); margin: 20px auto 40px; max-width: 480px; font-size: 16px; font-weight: 300; line-height: 1.65; position: relative; }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 48px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+  }
+  .footer-logo span { color: var(--accent); }
+
+  .footer-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .footer-links a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-copy { font-size: 12px; color: var(--muted); }
+
+  /* Scroll animations */
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    nav { padding: 16px 24px; }
+    nav ul { display: none; }
+    section { padding: 72px 24px; }
+    .features-grid { grid-template-columns: 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; max-width: 380px; }
+    .steps-layout { grid-template-columns: 1fr; gap: 40px; }
+    .flow-grid { grid-template-columns: repeat(3, 1fr); }
+    footer { flex-direction: column; gap: 24px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Workflow<span>DN</span></div>
+  <ul>
+    <li><a href="#features">Tính năng</a></li>
+    <li><a href="#how">Cách hoạt động</a></li>
+    <li><a href="#integrations">Tích hợp</a></li>
+    <li><a href="#pricing">Bảng giá</a></li>
+    <li><a href="#pricing" class="nav-cta">Liên hệ Sales →</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+
+  <div class="badge">✦ Ra mắt phiên bản 2.0</div>
+
+  <h1>Tự động hoá<br><em>mọi quy trình</em><br>chỉ trong vài phút</h1>
+
+  <p class="hero-sub">
+    Xây dựng workflow thông minh và chatbot AI mà không cần code. Kết nối hàng trăm ứng dụng, tự động hóa tác vụ, triển khai chatflow trong vài phút.
+  </p>
+
+  <div class="hero-actions">
+    <a href="#pricing" class="btn-primary">Liên hệ tư vấn →</a>
+  </div>
+
+  <!-- FLOW CANVAS -->
+  <div class="flow-canvas">
+    <div class="canvas-frame">
+      <div class="canvas-toolbar">
+        <div class="dot dot-r"></div>
+        <div class="dot dot-y"></div>
+        <div class="dot dot-g"></div>
+        <span class="canvas-title">workflow / khách hàng mới → CRM → Slack</span>
+      </div>
+      <div class="flow-grid">
+        <div class="flow-node active" style="animation-delay:0.6s">
+          <div class="node-status"></div>
+          <span class="node-icon">📥</span>
+          <div class="node-label">Trigger<br>Form</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node" style="animation-delay:0.7s">
+          <span class="node-icon">🤖</span>
+          <div class="node-label">AI<br>Phân loại</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node active2" style="animation-delay:0.8s">
+          <div class="node-status" style="background:var(--accent2)"></div>
+          <span class="node-icon">📊</span>
+          <div class="node-label">CRM<br>Update</div>
+        </div>
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-val">2.4k</div>
+          <div class="metric-label">Runs hôm nay</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">99.8%</div>
+          <div class="metric-label">Uptime</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">0.3s</div>
+          <div class="metric-label">Latency TB</div>
+        </div>
+        <div class="metric">
+          <div class="metric-val">128</div>
+          <div class="metric-label">Integrations</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="features-header reveal">
+    <div class="section-label">Tính năng</div>
+    <div class="section-title">Mọi thứ bạn cần<br>để tự động hóa</div>
+    <p class="section-sub">Từ workflow đơn giản đến chatbot AI phức tạp — FlowCraft xử lý tất cả với giao diện kéo thả trực quan.</p>
+  </div>
+
+  <div class="features-grid reveal">
+    <div class="feature-card">
+      <div class="feature-icon-box fi-green">🔀</div>
+      <div class="feature-title">Visual Workflow Builder</div>
+      <p class="feature-desc">Kéo thả để tạo workflow phức tạp. Hỗ trợ điều kiện rẽ nhánh, vòng lặp, xử lý lỗi tự động, và chạy song song nhiều luồng.</p>
+      <span class="feature-tag">→ No-code / Low-code</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-box fi-blue">💬</div>
+      <div class="feature-title">AI Chatflow Engine</div>
+      <p class="feature-desc">Xây dựng chatbot thông minh với LLM GPT-4, Claude, Gemini. Tích hợp kiến thức doanh nghiệp qua RAG. Hỗ trợ đa kênh: Web, Zalo, Messenger, WhatsApp.</p>
+      <span class="feature-tag">→ GPT-4 · Claude · Gemini</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-box fi-orange">⚡</div>
+      <div class="feature-title">Real-time Execution</div>
+      <p class="feature-desc">Chạy hàng nghìn workflow song song. Dashboard theo dõi real-time, log chi tiết từng bước, alert khi có lỗi. SLA 99.9% uptime.</p>
+      <span class="feature-tag">→ 99.9% SLA</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-box fi-blue">🔗</div>
+      <div class="feature-title">128+ Tích hợp sẵn</div>
+      <p class="feature-desc">Kết nối ngay với Salesforce, HubSpot, Slack, Google Workspace, Shopify, MySQL, REST API và nhiều hơn nữa. Webhook tùy chỉnh cho mọi hệ thống.</p>
+      <span class="feature-tag">→ API · Webhook · SDK</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-box fi-green">🧠</div>
+      <div class="feature-title">AI / LLM Actions</div>
+      <p class="feature-desc">Nhúng các bước AI vào bất kỳ điểm nào trong workflow: phân loại, tóm tắt, dịch thuật, trích xuất dữ liệu, sinh nội dung, phân tích cảm xúc.</p>
+      <span class="feature-tag">→ Function calling · RAG</span>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon-box fi-orange">🛡️</div>
+      <div class="feature-title">Bảo mật Doanh nghiệp</div>
+      <p class="feature-desc">Mã hóa end-to-end, kiểm soát truy cập theo vai trò (RBAC), audit log đầy đủ, tuân thủ SOC 2 Type II và ISO 27001. Self-host option.</p>
+      <span class="feature-tag">→ SOC 2 · ISO 27001</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" style="background: var(--bg); padding: 100px 60px;">
+  <div class="steps-section">
+    <div class="reveal">
+      <div class="section-label">Cách hoạt động</div>
+      <div class="section-title">Từ ý tưởng<br>đến production<br>trong 15 phút</div>
+      <p class="section-sub">Ba bước đơn giản để tự động hóa quy trình của bạn.</p>
+    </div>
+
+    <div class="steps-layout">
+      <div class="steps-list reveal">
+        <div class="step active">
+          <div class="step-num">01</div>
+          <div>
+            <div class="step-content-title">Chọn trigger & kết nối ứng dụng</div>
+            <p class="step-content-desc">Bắt đầu từ sự kiện: form submit, email mới, webhook, lịch trình, hay thủ công. Kết nối với hàng trăm app trong vài giây.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div>
+            <div class="step-content-title">Kéo thả xây dựng luồng xử lý</div>
+            <p class="step-content-desc">Thêm bước xử lý, điều kiện logic, AI actions, gọi API, biến đổi dữ liệu. Template sẵn có cho mọi ngành nghề.</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div>
+            <div class="step-content-title">Publish & giám sát real-time</div>
+            <p class="step-content-desc">Một click để publish. Dashboard theo dõi mọi run, log từng bước, cảnh báo lỗi tức thì. Scale tự động không giới hạn.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Preview -->
+      <div class="chat-preview reveal">
+        <div class="chat-header">
+          <div class="chat-avatar">🤖</div>
+          <div>
+            <div class="chat-name">WorkflowDN Bot</div>
+            <div class="chat-status">● Đang hoạt động</div>
+          </div>
+        </div>
+        <div class="chat-body">
+          <div class="chat-msg bot">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">Xin chào! Tôi có thể giúp gì cho bạn hôm nay? Tôi có thể tư vấn về sản phẩm, xử lý đơn hàng, hoặc giải đáp thắc mắc.</div>
+          </div>
+          <div class="chat-msg user">
+            <div class="msg-avatar">👤</div>
+            <div class="msg-bubble">Tôi muốn kiểm tra đơn hàng #38291</div>
+          </div>
+          <div class="chat-msg bot">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">Đã tìm thấy đơn hàng #38291 của bạn! 📦<br><br>Trạng thái: <strong style="color:var(--accent)">Đang giao hàng</strong><br>Dự kiến: 16/05 – 17/05<br>GHTK • Mã: GHTK00123</div>
+          </div>
+          <div class="chat-msg user">
+            <div class="msg-avatar">👤</div>
+            <div class="msg-bubble">Đổi địa chỉ giao được không?</div>
+          </div>
+          <div class="chat-msg bot">
+            <div class="msg-avatar">🤖</div>
+            <div class="msg-bubble">Tôi sẽ chuyển yêu cầu đến bộ phận vận chuyển ngay. Vui lòng cung cấp địa chỉ mới ✓</div>
+          </div>
+        </div>
+        <div class="chat-input-bar">
+          <input class="chat-input" type="text" placeholder="Nhập tin nhắn...">
+          <button class="chat-send">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTEGRATIONS -->
+<section class="integrations" id="integrations">
+  <div class="section-label reveal">Tích hợp</div>
+  <div class="section-title reveal" style="margin: 0 auto; text-align:center; max-width:100%">Kết nối với<br>toàn bộ hệ sinh thái</div>
+  <p class="integrations-sub reveal">128+ tích hợp sẵn. Nếu thiếu, dùng HTTP Request để kết nối bất kỳ API nào.</p>
+
+  <div class="logos-track reveal">
+    <div class="logo-chip"><span>📧</span> Gmail</div>
+    <div class="logo-chip"><span>💼</span> Slack</div>
+    <div class="logo-chip"><span>📊</span> Salesforce</div>
+    <div class="logo-chip"><span>🛍️</span> Shopify</div>
+    <div class="logo-chip"><span>📋</span> Notion</div>
+    <div class="logo-chip"><span>🗃️</span> Airtable</div>
+    <div class="logo-chip"><span>📅</span> Google Calendar</div>
+  </div>
+  <div class="logos-track reveal" style="animation-delay:0.1s">
+    <div class="logo-chip"><span>💬</span> Zalo OA</div>
+    <div class="logo-chip"><span>📘</span> Messenger</div>
+    <div class="logo-chip"><span>📱</span> WhatsApp</div>
+    <div class="logo-chip"><span>🤖</span> OpenAI</div>
+    <div class="logo-chip"><span>🧠</span> Claude AI</div>
+    <div class="logo-chip"><span>📦</span> MySQL</div>
+    <div class="logo-chip"><span>🔗</span> Webhook</div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-header reveal">
+    <div class="section-label">Bảng giá</div>
+    <div class="section-title" style="max-width:100%; margin:0 auto; text-align:center">Giải pháp tùy chỉnh<br>theo nhu cầu doanh nghiệp</div>
+    <p class="section-sub" style="text-align:center; margin:16px auto 0">Chúng tôi thiết kế gói dịch vụ phù hợp với quy mô và đặc thù của từng doanh nghiệp.</p>
+  </div>
+
+  <div class="reveal" style="max-width: 680px; margin: 0 auto;">
+    <div class="plan featured" style="text-align:center; padding: 52px 48px;">
+      <div class="plan-badge">Tư vấn miễn phí</div>
+      <div style="font-size: 48px; margin-bottom: 16px;">📞</div>
+      <div class="plan-name" style="font-size:18px; color: var(--text); letter-spacing:-0.3px; text-transform:none; margin-bottom:8px; font-family:'Syne',sans-serif;">Liên hệ đội ngũ Sales</div>
+      <p style="color:var(--muted); font-size:15px; font-weight:300; line-height:1.7; max-width:420px; margin:0 auto 36px;">
+        Nhận báo giá và tư vấn giải pháp phù hợp nhất cho doanh nghiệp của bạn. Đội ngũ chuyên gia sẽ phản hồi trong vòng 24 giờ.
+      </p>
+      <div class="plan-divider"></div>
+      <ul class="plan-features" style="text-align:left; margin-bottom:36px;">
+        <li>Workflow & Chatflow không giới hạn</li>
+        <li>Tích hợp toàn bộ hệ thống hiện có</li>
+        <li>AI / LLM actions theo yêu cầu</li>
+        <li>Self-host / On-premise option</li>
+        <li>RBAC, SSO & kiểm soát bảo mật nâng cao</li>
+        <li>SLA 99.9% & hỗ trợ dedicated 24/7</li>
+        <li>Triển khai & đào tạo tận nơi</li>
+      </ul>
+      <a href="mailto:sales@workflowdn.vn" class="plan-btn featured-btn" style="display:inline-block; text-decoration:none; padding:16px 48px; font-size:15px;">
+        Liên hệ Sales ngay →
+      </a>
+      <p style="margin-top:16px; font-size:12px; color:var(--muted);">Hoặc gọi hotline: <strong style="color:var(--text)">1800 xxxx</strong></p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-glow"></div>
+  <h2>Sẵn sàng tự động hóa<br><em style="font-style:normal; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text">quy trình của bạn?</em></h2>
+  <p>Đội ngũ chuyên gia WorkflowDN sẵn sàng tư vấn giải pháp phù hợp nhất cho doanh nghiệp của bạn.</p>
+  <div style="position:relative; display:flex; gap:16px; justify-content:center">
+    <a href="#pricing" class="btn-primary">Liên hệ Sales →</a>
+    <a href="#" class="btn-secondary">Xem tài liệu</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Workflow<span>DN</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Tính năng</a></li>
+    <li><a href="#">Bảng giá</a></li>
+    <li><a href="#">Tài liệu</a></li>
+    <li><a href="#">Blog</a></li>
+    <li><a href="#">Liên hệ</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 WorkflowDN. All rights reserved.</div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Step interaction
+  document.querySelectorAll('.step').forEach(step => {
+    step.addEventListener('click', () => {
+      document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+      step.classList.add('active');
+    });
+  });
+
+  // Chat input
+  const chatInput = document.querySelector('.chat-input');
+  const chatSend = document.querySelector('.chat-send');
+  const chatBody = document.querySelector('.chat-body');
+
+  function sendMsg() {
+    const val = chatInput.value.trim();
+    if (!val) return;
+    const msg = document.createElement('div');
+    msg.className = 'chat-msg user';
+    msg.innerHTML = `<div class="msg-avatar">👤</div><div class="msg-bubble">${val}</div>`;
+    chatBody.appendChild(msg);
+    chatInput.value = '';
+    chatBody.scrollTop = chatBody.scrollHeight;
+    setTimeout(() => {
+      const reply = document.createElement('div');
+      reply.className = 'chat-msg bot';
+      reply.innerHTML = `<div class="msg-avatar">🤖</div><div class="msg-bubble">Cảm ơn bạn! Tôi đang xử lý yêu cầu của bạn... ⚡</div>`;
+      chatBody.appendChild(reply);
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }, 800);
+  }
+
+  chatSend.addEventListener('click', sendMsg);
+  chatInput.addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
+</script>
+</body>
+</html>
